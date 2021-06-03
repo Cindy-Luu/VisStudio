@@ -1,0 +1,86 @@
+@using Sapphire.Controllers
+@model IEnumerable<Sapphire.Models.PatientInfo>
+
+
+@{
+    ViewBag.Title = "Patient Search";
+}
+<div style="font-family:Arial">
+
+    <h2>Patient Search</h2>
+
+
+    @using (Html.BeginForm())
+    {
+        <p>
+            <table>
+                <tr>
+                    <td>
+                        Last Name:
+                    </td>
+                    <td>
+                        @Html.TextBox("searchLastName")
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        First Name:
+                    </td>
+                    <td>
+                        @Html.TextBox("searchFirstName")
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Search" class="btn btn-primary btn-large" />
+            @if (Model == null)
+            {
+                @Html.ActionLink("Create New Patient", "Create", "PatientInfoes", null, new { @class = "btn btn-primary btn-large" })
+            }
+        </p>
+    }
+
+    @if (Model != null)
+    {
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.ActionLink("Last Name", "Index", new { sortOder = ViewBag.NameSortParm} )
+                    @*@Html.DisplayNameFor(model => model.LastName)*@
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </th>
+                <th>
+                    @Html.ActionLink("DOB", "Index", new { sortOrder = ViewBag.DateSortParm})
+                    @*  @Html.DisplayNameFor(model => model.DOB)*@
+                </th>
+                <th>Action</th>
+            </tr>
+
+            @foreach (var item in Model)
+                {
+                <tr>
+                    <td>
+                        @if (Convert.ToInt32(Session["ProcessPath"]) == 1)
+                        {
+                            @Html.ActionLink(item.LastName, "SelectCoverage", "CoverageTypeLTs", new { PatientId = item.id, InsuranceType = 1 }, null)
+
+                        }
+                        else
+                        {
+                            @Html.ActionLink(item.LastName, "Details", new { id = item.id })
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DOB)
+                    </td>
+                </tr>
+            }
+        </table>
+        @Html.ActionLink("Create New Patient", "Create", "PatientInfoes", null, new { @class = "btn btn-primary btn-large" })
+    }
+
+</div>
