@@ -1,0 +1,320 @@
+@model IEnumerable<Sapphire.Models.ReqInfo>
+
+@{
+    ViewBag.Title = "OrderSample";
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+
+        function toggleChecked(status) {
+            $("#checkboxes input").each(function () {              
+                $(this).prop("checked", status);
+            });
+        }
+
+        $(document).ready(function () {
+            var checkAllBox = $("#checkall");
+            checkAllBox.prop('checked', true);
+            checkAllBox.click(function () {
+                var status = checkAllBox.prop('checked');
+                toggleChecked(status);
+            });
+        });
+    </script>
+}
+
+<h2>OrderSample</h2>
+
+    @if (Model != null)
+    {
+        using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <table class="table">
+                <tr>
+                    <td>
+                        Select All
+                        <input type="checkbox" id="checkall" /><span>Check All</span>
+                    </td>
+
+                    <th>
+                        Patient's Name
+                    </th>
+                    <th>
+                        Medical Necessity
+                    </th>
+                    <th>
+                        Ordered Tests
+                    </th>
+                    <th>Diagnosis Codes</th>
+                </tr>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @*   <div class="form-group">
+                                <div class="col-md-10">*@
+                            <div id="checkboxes">
+                                @Html.EditorFor(Model => item.Authorized)
+                            </div>
+                            @*</div>
+                                </div>*@
+                        </td>
+                        <td>
+                            @if (Convert.ToInt32(Session["ProcessPath"]) == 1)
+                        {
+                                @Html.ActionLink(item.PatientInfo.LastName + ", " + item.PatientInfo.FirstName, "Provider", "Signature", new { ReqId = item.id }, null)
+
+                            }
+                            else
+                            {
+                                @Html.ActionLink(item.PatientInfo.LastName + ", " + item.PatientInfo.FirstName, "Provider", "Signature", new { ReqId = item.id }, null)
+                            }
+                        </td>
+                        <td>
+                            @{
+                                string medicalNecessity = "";
+                                bool previousMN = false;
+
+                                if (item.MedicalNecessity.Type1 == true)
+                                {
+                                    medicalNecessity = "New patient baseline screening";
+                                    previousMN = true;
+                                }
+                                if (item.MedicalNecessity.Type2 == true)
+                                {
+                                    if (previousMN == true)
+                                    {
+                                        medicalNecessity = medicalNecessity + "\r\n";
+                                    }
+                                    medicalNecessity = medicalNecessity + "Long-term use of medications";
+                                    previousMN = true;
+                                }
+                                if (item.MedicalNecessity.Type3 == true)
+                                {
+                                    if (previousMN == true)
+                                    {
+                                        medicalNecessity = medicalNecessity + "\r\n";
+                                    }
+                                    medicalNecessity = medicalNecessity + "Therapeutic drug monitoring";
+                                    previousMN = true;
+                                }
+                                if (item.MedicalNecessity.Other != null)
+                                {
+                                    if (item.MedicalNecessity.Type4 == true)
+                                    {
+                                        medicalNecessity = medicalNecessity + "High-risk group patient monitoring";
+                                        previousMN = true;
+                                    }
+                                    medicalNecessity = medicalNecessity + item.MedicalNecessity.Other;
+                                    previousMN = true;
+                                }
+                            }
+                            @Html.ActionLink(medicalNecessity, "Edit", "MedicalNecessities", new { id = item.MedicalNecessityId, ProcessPath = 2 }, null)
+                        </td>
+
+                        <td>
+                            @{
+                                string testsOrdered = "";
+                                bool previousTO = false;
+
+                                if (item.OrderedTest.Custom == true)
+                                {
+                                    testsOrdered = "Custom Panel";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.Screen == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Drug Screen (Qualitative)";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.Full == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Comprehensive Qualitative & Quantitative";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.LCMS == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Full Quantitative";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.Alcohol == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Alcohol";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.Benzodiazepines == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Benzodiazepines";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.Opiates == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Opiates";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.Cannabis == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Cannabis";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.Illicit == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Illicits";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.Methadone == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Methadone";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.MuscleRelaxants == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Muscle Relaxants";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.OtherAnalgesics == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Other Analgesics";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.OtherMedications == true)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + "Other Medications";
+                                    previousTO = true;
+                                }
+                                if (item.OrderedTest.Other != null)
+                                {
+                                    if (previousTO == true)
+                                    {
+                                        testsOrdered = testsOrdered + ", ";
+                                    }
+                                    testsOrdered = testsOrdered + item.OrderedTest.Other;
+                                    previousTO = true;
+                                }
+                            }
+                            @Html.ActionLink(testsOrdered, "SelectCoverage", "CoverageTypeLTs", new { PatientId = item.id, InsuranceType = 1 }, null)
+                        </td>
+                        <td>
+                            @{
+                                string diagnosisCodes = "";
+                                bool previousDC = false;
+
+                                if (item.DiagnosisCode.DiagCode1 == true)
+                                {
+                                    diagnosisCodes = "Z79.891 - Long-term (current) use of opiate analgesic";
+                                    previousDC = true;
+                                }
+                                if (item.DiagnosisCode.DiagCode2 == true)
+                                {
+                                    if (previousDC == true)
+                                    {
+                                        diagnosisCodes = diagnosisCodes + "\r\n";
+                                    }
+                                    diagnosisCodes = diagnosisCodes + "Z79.899 - Other long-term (current) drug therapy";
+                                    previousDC = true;
+                                }
+                                if (item.DiagnosisCode.DiagCode3 == true)
+                                {
+                                    if (previousDC == true)
+                                    {
+                                        diagnosisCodes = diagnosisCodes + "\r\n";
+                                    }
+                                    diagnosisCodes = diagnosisCodes + "Z51.81 - Encounter for therapeutic drug level monitoring";
+                                    previousDC = true;
+                                }
+                                if (item.DiagnosisCode.DiagCode4 == true)
+                                {
+                                    if (previousDC == true)
+                                    {
+                                        diagnosisCodes = diagnosisCodes + "\r\n";
+                                    }
+                                    diagnosisCodes = diagnosisCodes + "Z11.20 - Opioid type dependence, uncomplicated";
+                                    previousDC = true;
+                                }
+                                if (item.DiagnosisCode.DiagCode5 == true)
+                                {
+                                    if (previousDC == true)
+                                    {
+                                        diagnosisCodes = diagnosisCodes + "\r\n";
+                                    }
+                                    diagnosisCodes = diagnosisCodes + "Z12.10 - Cannabis abuse, uncomplicated";
+                                    previousDC = true;
+                                }
+                                if (item.DiagnosisCode.Other != null)
+                                {
+                                    if (previousDC == true)
+                                    {
+                                        diagnosisCodes = diagnosisCodes + "\r\n";
+                                    }
+                                    diagnosisCodes = diagnosisCodes + item.DiagnosisCode.Other;
+
+                                }
+                            }
+                            @Html.ActionLink(diagnosisCodes, "SelectCoverage", "CoverageTypeLTs", new { PatientId = item.id, InsuranceType = 1 }, null)
+                        </td>
+                    </tr>
+                                }
+            </table>
+            
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Submit" class="btn btn-default" />
+                </div>
+            </div>
+                                    }
+                                }
+                                
